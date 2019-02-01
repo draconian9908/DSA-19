@@ -2,41 +2,78 @@ public class MyArrayList {
     private Cow[] elems;
     private int size;
 
-    // TODO: Runtime: O(?)
+    // Runtime: O(1)
     public MyArrayList() {
-        // TODO
+        elems = new Cow[10];
+        size = 0;
     }
 
-    // TODO: Runtime: O(?)
+    // Runtime: O(1)
     public MyArrayList(int capacity) {
-        // TODO
+        elems = new Cow[capacity];
+        size = 0;
     }
 
-    // TODO: Runtime: O(?)
+    // Runtime: O(1)*
     public void add(Cow c) {
-        // TODO
+        if (size == elems.length) {
+            Cow[] newElems = new Cow[size*2];
+            System.arraycopy(elems,0,newElems,0,size);
+            elems = newElems;
+        }
+        elems[size] = c;
+        size++;
     }
 
-    // TODO: Runtime: O(?)
+    // Runtime: O(1)
     public int size() {
-        // TODO
-        return -1;
+        return size;
     }
 
-    // TODO: Runtime: O(?)
+    // Runtime: O(1)
     public Cow get(int index) {
-        // TODO
-        return null;
+        if (index < 0 || index >= size){
+            throw new IndexOutOfBoundsException();
+        }
+        return elems[index];
     }
 
-    // TODO: Runtime: O(?)
+    // Runtime: O(n)*
     public Cow remove(int index) {
-        // TODO
-        return null;
+        if (index < 0 || index >= size){
+            throw new IndexOutOfBoundsException();
+        }
+        Cow r = elems[index];
+        for (int i = index; i < size; i++){
+            if (i == size-1){
+                elems[i] = null;
+            } else {
+                elems[i] = elems[i+1];
+            }
+        }
+        size--;
+        if (size < elems.length/4 && size > 1) {
+            Cow[] newElems = new Cow[size/2];
+            System.arraycopy(elems,0,newElems,0,size);
+            elems = newElems;
+        }
+        return r;
     }
 
-    // TODO: Runtime: O(?)
+    // Runtime: O(n)*
     public void add(int index, Cow c) {
-        // TODO
+        if (index < 0 || index > size){
+            throw new IndexOutOfBoundsException();
+        }
+        if (size == elems.length) {
+            Cow[] newElems = new Cow[size*2];
+            System.arraycopy(elems,0,newElems,0,size);
+            elems = newElems;
+        }
+        for (int i=size; i>index; i--){
+            elems[i] = elems[i-1];
+        }
+        elems[index] = c;
+        size++;
     }
 }
