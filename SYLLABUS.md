@@ -45,7 +45,7 @@ If an instructor is listed on the hours, they are holding on call hours. So, mes
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **11-12PM** Anusha, Prava
 
 #### Sunday <br/>
-			
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **7-8PM** Kevin <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **8-9PM** Athmika, Emily, kevin, Nick Steelman <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **9-10PM** Athmika, Emily, Nick Steelman <br/>
