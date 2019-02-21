@@ -12,15 +12,16 @@ public class QuickSort extends SortAlgorithm {
 
     /**
      * TODO
-     * Best-case runtime:
-     * Worst-case runtime:
-     * Average-case runtime:
+     * Best-case runtime: O(nlogn)
+     * Worst-case runtime: O(n^2)
+     * Average-case runtime: O(nlogn)
      *
-     * Space-complexity:
+     * Space-complexity: O(1)
      */
     @Override
     public int[] sort(int[] array) {
-        // TODO: Sort the array. Make sure you avoid the O(N^2) runtime worst-case
+        shuffleArray(array);
+        quickSort(array,0,array.length-1);
         return array;
     }
 
@@ -33,15 +34,22 @@ public class QuickSort extends SortAlgorithm {
      * @param hi The ending index of the subarray being considered (inclusive)
      */
     public void quickSort(int[] a, int lo, int hi) {
+        if (a.length == 0 || a.length == 1) {// if array is negligible/already sorted, return
+            return;
+        }
+        if (lo < 0 || lo >= a.length || hi < 0 || hi >= a.length) {// check if indices are legal
+            return;
+        }
         if (lo < hi) {
-            int p = partition(a, lo, hi);
-            // TODO
+            int p = partition(a, lo, hi);// partition; initial sort
+            quickSort(a,lo,p-1);// sort left subarray; recursive
+            quickSort(a,p+1,hi);// sort right subarray; recursive
         }
     }
 
 
     /**
-     * Given an array, choose the array[low] element as the "pivot" element.
+     * Given an array, choose the array[lo] element as the "pivot" element.
      * Place all elements smaller than "pivot" on "pivot"'s left, and all others
      * on its right. Return the final position of "pivot" in the partitioned array.
      *
@@ -49,8 +57,21 @@ public class QuickSort extends SortAlgorithm {
      * @param hi The ending index of the subarray being considered (inclusive)
      */
     public int partition(int[] array, int lo, int hi) {
-        // TODO
-        return 0;
+        int pivot = array[lo];
+        int j = lo;
+        int i = hi;
+        while (!(i<=j) && i>=lo) {
+            if (array[i] < pivot) {
+                int temp = array[i];
+                array[i] = array[j+1];
+                swap(array,j,j+1);
+                array[j] = temp;
+                j++;
+                continue;
+            }
+            i--;
+        }
+        return j;
     }
 
 }
