@@ -19,19 +19,24 @@ public class RadixSort {
      */
     static void countingSortByDigit(int[] A, int b, int n) {
         LinkedList<Integer>[] L = new LinkedList[b];
-        for (int i = 0; i < b; i++)
+        for (int i = 0; i < b; i++) {
             L[i] = new LinkedList<>();
+        }
         for (int i : A) {
-            // TODO: Extract the relevant digit from i, and add i to the corresponding Linked List.
+            int d = getNthDigit(i,b,n);
+            L[d].add(i);
         }
         int j = 0; // index in A to place numbers
         for (LinkedList<Integer> list : L) {
-            // TODO: Put all numbers in the linked lists into A
+            while (!list.isEmpty()) {
+                A[j] = list.poll();
+                j++;
+            }
         }
     }
 
     /**
-     * Runtime: TODO: Express your runtime in terms of n, b, and w
+     * Runtime: O(w(n+b))
      *
      * n: length of array
      * w: word length of integers A in base b (equal to log base b of k (log_b k) )
@@ -41,10 +46,13 @@ public class RadixSort {
     static void radixSort(int[] A, int b) {
         // Calculate the upper-bound for numbers in A
         int k = A[0] + 1;
-        for (int i = 1; i < A.length; i++)
+        for (int i = 1; i < A.length; i++) {
             k = (A[i] + 1 > k) ? A[i] + 1 : k;
+        }
         int w = (int) Math.ceil(Math.log(k) / Math.log(b)); // w = log base b of k, word length of numbers
-        // TODO: Perform radix sort
+        for (int i = 0; i <= w; i++) {
+            countingSortByDigit(A,b,i);
+        }
     }
 
 }
