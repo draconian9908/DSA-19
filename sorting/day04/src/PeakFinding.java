@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class PeakFinding {
 
     // Return -1 if left is higher, 1 if right is higher, 0 if peak
@@ -49,13 +51,120 @@ public class PeakFinding {
 
 
     public static int findOneDPeak(int[] nums) {
-        // TODO
-        return 0;
+        int start = nums.length/2;
+        int status = peakOneD(start, nums);
+        int rec = 0;
+        if (status == -1) {
+            findOneDPeak(Arrays.copyOfRange(nums,0,start));
+            return start;
+        }
+        else if (status == 1) {
+            rec = findOneDPeak(Arrays.copyOfRange(nums,start+1,nums.length));
+            return start + (rec+1);
+        }
+        else {
+            return start;
+        }
     }
 
     public static int[] findTwoDPeak(int[][] nums) {
-        // TODO
-        return null;
+        int startY = nums.length/2;
+        // find max x index based on the starting point for y (halfway)
+        int maxX = maxXIndex(startY,0,nums[0].length,nums);
+        int statusX = peakX(maxX,startY,nums);
+        // if peak is to the left
+        if (statusX == -1) {
+            int startX = maxX/2;
+            int maxY = maxYIndex(startX,0,nums.length,nums);
+            int statusY = peakY(startX,maxY,nums);
+            // if peak is to the left and up
+            if (statusY == -1) {
+                int[][] temp = new int[maxY][maxX];
+                for (int i = 0; i < (maxY); i++) {
+                    temp[i] = Arrays.copyOfRange(nums[i],0,maxX);
+                }
+                findTwoDPeak(temp);
+                return new int[]{startY,startX};
+            }
+            // if peak is to the left and down
+            else if (statusY == 1) {
+                int[][] temp = new int[nums.length-maxY][maxX];
+                for (int i = 0; i < (nums.length-maxY); i++) {
+                    temp[i] = Arrays.copyOfRange(nums[i],0,maxX);
+                }
+                int[] rec = findTwoDPeak(temp);
+                return new int[]{(rec[0]+1)+startY,(rec[1]+1)+startX};
+            }
+            // if peak is to the left, no input on up or down
+            else {
+                int[][] temp = new int[nums.length][maxX];
+                for (int i = 0; i < (nums.length); i++) {
+                    temp[i] = Arrays.copyOfRange(nums[i],0,maxX);
+                }
+                findTwoDPeak(temp);
+                return new int[]{startY,startX};
+            }
+        }
+        // if peak is to the right
+        else if (statusX == 1) {
+            int startX = maxX+((nums.length-maxX)/2);
+            int maxY = maxYIndex(startX,0,nums.length,nums);
+            int statusY = peakY(startX,maxY,nums);
+            int[] rec;
+            // if peak is to the right and up
+            if (statusY == -1) {
+                int[][] temp = new int[maxY][maxX];
+                for (int i = 0; i < (maxY); i++) {
+                    temp[i] = Arrays.copyOfRange(nums[i],0,maxX);
+                }
+                rec = findTwoDPeak(temp);
+                return new int[]{(rec[0]+1)+startY,(rec[1]+1)+startX};
+            }
+            // if peak is to the right and down
+            else if (statusY == 1) {
+                int[][] temp = new int[nums.length-maxY][maxX];
+                for (int i = 0; i < (nums.length-maxY); i++) {
+                    temp[i] = Arrays.copyOfRange(nums[i],0,maxX);
+                }
+                rec = findTwoDPeak(temp);
+                return new int[]{(rec[0]+1)+startY,(rec[1]+1)+startX};
+            }
+            // if peak is to the right, no input on up or down
+            else {
+                int[][] temp = new int[nums.length][maxX];
+                for (int i = 0; i < (nums.length); i++) {
+                    temp[i] = Arrays.copyOfRange(nums[i],0,maxX);
+                }
+                rec = findTwoDPeak(temp);
+                return new int[]{(rec[0]+1)+startY,(rec[1]+1)+startX};
+            }
+        }
+        // if no input on right or left
+        else {
+            int maxY = maxYIndex(maxX,0,nums.length,nums);
+            int statusY = peakY(maxX,maxY,nums);
+            // if peak up, no input on right or left
+            if (statusY == -1) {
+                int[][] temp = new int[maxY][nums[0].length];
+                for (int i = 0; i < (maxY); i++) {
+                    temp[i] = Arrays.copyOf(nums[i],nums[0].length);
+                }
+                findTwoDPeak(temp);
+                return new int[]{startY,maxX};
+            }
+            // if peak down, no input on right or left
+            else if (statusY == 1) {
+                int[][] temp = new int[nums.length-maxY][nums[0].length];
+                for (int i = 0; i < (nums.length-maxY); i++) {
+                    temp[i] = Arrays.copyOf(nums[i],nums[0].length);
+                }
+                int[] rec = findTwoDPeak(temp);
+                return new int[]{(rec[0]+1)+startY,(rec[1]+1)+maxX};
+            }
+            // if peak!
+            else {
+                return new int[]{startY,maxX};
+            }
+        }
     }
-
 }
