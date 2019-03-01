@@ -72,7 +72,7 @@ public class PeakFinding {
 
     /**
      * 2D Peak Finding
-     * Runtime: O()
+     * Runtime: O(N)
      */
     public static int[] findTwoDPeak(int[][] nums) {
         int startY = nums.length/2;
