@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class BinarySearchTree<T extends Comparable<T>> {
@@ -27,9 +28,29 @@ public class BinarySearchTree<T extends Comparable<T>> {
             add(k);
     }
 
+    private List<T> check(TreeNode<T> n, List<T> l) {
+        if (n.hasLeftChild()) {
+            check(n.leftChild,l);
+        }
+        l.add(n.key);
+        if (n.hasRightChild()) {
+            check(n.rightChild,l);
+        }
+        return l;
+    }
+
+    /**
+     *
+     * Runtime: O(N)
+     */
     public List<T> inOrderTraversal() {
-        // TODO
-        return null;
+        if (size == 0 || root == null) {
+            List<T> l = new ArrayList<>();
+            return l;
+        }
+        List<T> sorted = new ArrayList<>();
+        check(root,sorted);
+        return sorted;
     }
 
     /**
@@ -66,8 +87,9 @@ public class BinarySearchTree<T extends Comparable<T>> {
             replacement = (n.hasRightChild()) ? n.rightChild : n.leftChild; // replacement is the non-null child
         else {
             // Case 3: two children
-            // TODO
-            replacement = null;
+            replacement = findSuccessor(n);
+            delete(replacement);
+            replacement.moveChildrenFrom(n);
         }
 
         // Put the replacement in its correct place, and set the parent.
@@ -75,6 +97,10 @@ public class BinarySearchTree<T extends Comparable<T>> {
         return replacement;
     }
 
+    /**
+     *
+     * Runtime: O(N)
+     */
     public T findPredecessor(T key) {
         // finds and returns the TreeNode with key = key if such a TreeNode exists in the tree
         TreeNode<T> n = find(root, key);
@@ -88,6 +114,10 @@ public class BinarySearchTree<T extends Comparable<T>> {
         return null;
     }
 
+    /**
+     *
+     * Runtime: O(N)
+     */
     public T findSuccessor(T key) {
         // finds and returns the TreeNode with key = key if such a TreeNode exists in the tree
         TreeNode<T> n = find(root, key);
@@ -102,12 +132,34 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     private TreeNode<T> findPredecessor(TreeNode<T> n) {
-        // TODO
+        List<T> l = new ArrayList<>();
+        if (n.hasLeftChild()) {
+            check(n.leftChild,l);
+            return find(root,l.get(l.size()-1));
+        }
+        TreeNode<T> curr = n;
+        while (curr.parent != null && curr.isLeftChild()) {
+            curr = curr.parent;
+        }
+        if (curr.parent != null && curr.isRightChild()) {
+            return curr.parent;
+        }
         return null;
     }
 
     private TreeNode<T> findSuccessor(TreeNode<T> n) {
-        // TODO
+        List<T> l = new ArrayList<>();
+        if (n.hasRightChild()) {
+            check(n.rightChild,l);
+            return find(root,l.get(0));
+        }
+        TreeNode<T> curr = n;
+        while (curr.parent != null && curr.isRightChild()) {
+            curr = curr.parent;
+        }
+        if (curr.parent != null && curr.isLeftChild()) {
+            return curr.parent;
+        }
         return null;
     }
 
