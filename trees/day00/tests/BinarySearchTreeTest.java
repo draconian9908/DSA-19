@@ -71,7 +71,8 @@ public class BinarySearchTreeTest {
             Integer predecessor = null;
             if (j > 0)
                 predecessor = sorted[j-1];
-            assertEquals(predecessor, bst.findPredecessor(sorted[j]));
+            Integer test = bst.findPredecessor(sorted[j]);
+            assertEquals(predecessor, test);
         }
     }
 

@@ -21,21 +21,21 @@ public class ProblemsTest {
         notisomorphic = TreeUtils.generateTree(new Integer[]{10, 9, 6, 3, 5, 2, 1, null, null, 1, 2, null, null, null, null});
     }
 
-    @Test
-    public void testMinimalHeight() {
-        List<Integer> input = new ArrayList<>();
-        populateInput(input, new Integer[]{10});
-        BinarySearchTree<Integer> bst = Problems.minimalHeight(input);
-        assertEquals(0, TreeUtils.getMaxHeight(bst.root, 0));
-
-        populateInput(input, new Integer[]{5,0,4,2,3,1});
-        bst = Problems.minimalHeight(input);
-        assertEquals(2, TreeUtils.getMaxHeight(bst.root, 0));
-
-        populateInput(input, new Integer[] {1,2,3,4,5,6,7,8,9,10});
-        bst = Problems.minimalHeight(input);
-        assertEquals(3, TreeUtils.getMaxHeight(bst.root, 0));
-    }
+//    @Test
+//    public void testMinimalHeight() {
+//        List<Integer> input = new ArrayList<>();
+//        populateInput(input, new Integer[]{10});
+//        BinarySearchTree<Integer> bst = Problems.minimalHeight(input);
+//        assertEquals(0, TreeUtils.getMaxHeight(bst.root, 0));
+//
+//        populateInput(input, new Integer[]{5,0,4,2,3,1});
+//        bst = Problems.minimalHeight(input);
+//        assertEquals(2, TreeUtils.getMaxHeight(bst.root, 0));
+//
+//        populateInput(input, new Integer[] {1,2,3,4,5,6,7,8,9,10});
+//        bst = Problems.minimalHeight(input);
+//        assertEquals(3, TreeUtils.getMaxHeight(bst.root, 0));
+//    }
 
     @Test
     public void testIsomorphic() {
@@ -47,9 +47,9 @@ public class ProblemsTest {
         assertFalse(Problems.isIsomorphic(notisomorphic, isomorphic2));
     }
 
-    private void populateInput(List<Integer> A, Integer[] values) {
-        A.clear();
-        for (int i : values)
-            A.add(i);
-    }
+//    private void populateInput(List<Integer> A, Integer[] values) {
+//        A.clear();
+//        for (int i : values)
+//            A.add(i);
+//    }
 }
