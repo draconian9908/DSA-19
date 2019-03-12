@@ -27,7 +27,7 @@ public class RedBlackTree<T extends Comparable<T>> extends BinarySearchTree<T> {
 
 
     //For the rotates, don't forget to reassign colors. If you are unclear about
-    //how to do this, you can try drawing ou examples and make sure you
+    //how to do this, you can try drawing out examples and make sure you
     //maintain the requirements of a LLRB:
     //-All leaves have the same black distance
     //-No right red nodes
@@ -35,19 +35,29 @@ public class RedBlackTree<T extends Comparable<T>> extends BinarySearchTree<T> {
 
     // make a left-leaning link lean to the right
     TreeNode<T> rotateRight(TreeNode<T> h) {
-        // TODO
-        return h;
+        TreeNode<T> y = h.leftChild;
+        h.leftChild = y.rightChild;
+        y.rightChild = h;
+        y.color = y.rightChild.color;
+        y.rightChild.color = RED;
+        return y;
     }
 
     // make a right-leaning link lean to the left
     TreeNode<T> rotateLeft(TreeNode<T> h) {
-        // TODO
-        return h;
+        TreeNode<T> x = h.rightChild;
+        h.rightChild = x.leftChild;
+        x.leftChild = h;
+        x.color = x.leftChild.color;
+        x.leftChild.color = RED;
+        return x;
     }
 
     // flip the colors of a TreeNode and its two children
     TreeNode<T> flipColors(TreeNode<T> h) {
-        // TODO
+        h.color = !h.color;
+        h.rightChild.color = !h.rightChild.color;
+        h.leftChild.color = !h.leftChild.color;
         return h;
     }
 
@@ -60,19 +70,27 @@ public class RedBlackTree<T extends Comparable<T>> extends BinarySearchTree<T> {
      * return balanced node
      */
     private TreeNode<T> balance(TreeNode<T> h) {
-        // TODO
+        if (isRed(h.leftChild) && isRed(h.leftChild.leftChild)) {
+            h = rotateRight(h);
+        }
+        if (isRed(h.leftChild) && isRed(h.rightChild)) {
+            h = flipColors(h);
+        }
+        if (isRed(h.rightChild)) {
+            h = rotateLeft(h);
+        }
         return h;
     }
 
 
     /**
      * Recursively insert a new node into the BST
-     * Runtime: TODO
+     * Runtime: O(logN)
      */
     @Override
     TreeNode<T> insert(TreeNode<T> h, T key) {
         h = super.insert(h, key);
-        // TODO: use balance to correct for the three rotation cases
+        h = balance(h);
         return h;
     }
 
@@ -82,51 +100,53 @@ public class RedBlackTree<T extends Comparable<T>> extends BinarySearchTree<T> {
     // ====================================
 
 
-    /**
-     * Removes the specified key from the tree
-     * (if the key is in this tree).
-     *
-     * @param key the key
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
-    public boolean delete(T key) {
-        if (key == null) throw new IllegalArgumentException("argument to delete() is null");
-        if (!contains(key)) return false;
-
-        // if both children of root are black, set root to red
-        if (!isRed(root.leftChild) && !isRed(root.rightChild))
-            root.color = RED;
-
-        root = delete(root, key);
-        size--;
-        if (!isEmpty()) root.color = BLACK;
-        return true;
-    }
+//    /**
+//     * Removes the specified key from the tree
+//     * (if the key is in this tree).
+//     *
+//     * @param key the key
+//     * @throws IllegalArgumentException if {@code key} is {@code null}
+//     */
+//    public boolean delete(T key) {
+//        if (key == null) throw new IllegalArgumentException("argument to delete() is null");
+//        if (!contains(key)) return false;
+//
+//        // if both children of root are black, set root to red
+//        if (!isRed(root.leftChild) && !isRed(root.rightChild))
+//            root.color = RED;
+//
+//        root = delete(root, key);
+//        size--;
+//        if (!isEmpty()) root.color = BLACK;
+//        return true;
+//    }
 
 
     // the smallest key in subtree rooted at x; null if no such key
-    private TreeNode<T> min(TreeNode<T> x) {
-        if (x.leftChild == null) return x;
-        else return min(x.leftChild);
-    }
+//    private TreeNode<T> min(TreeNode<T> x) {
+//        if (x.leftChild == null) return x;
+//        else return min(x.leftChild);
+//    }
 
     // delete the key-value pair with the minimum key rooted at h
-    TreeNode<T> deleteMin(TreeNode<T> h) {
+//    TreeNode<T> deleteMin(TreeNode<T> h) {
         // OPTIONAL TODO: write this function and use it in delete(h, key)
-        return h;
-    }
+//        return h;
+//    }
     // delete the key-value pair with the given key rooted at h
-    TreeNode<T> delete(TreeNode<T> h, T key) {
+//    TreeNode<T> delete(TreeNode<T> h, T key) {
         // OPTIONAL TODO
-        return h;
-    }
+//        return h;
+//    }
 
     // ====================================
     //          LLRB Verification
     // ====================================
 
 
-    // TODO: understand how the following functions can be used to verify a valid LLRB
+    /**
+     * DONE
+     */
 
     public boolean is23() {
         return is23(root);
