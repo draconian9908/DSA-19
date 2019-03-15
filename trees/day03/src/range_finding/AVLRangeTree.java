@@ -71,17 +71,45 @@ public class AVLRangeTree extends BinarySearchTree<Integer> {
     }
 
     // Return all keys that are between [lo, hi] (inclusive).
-    // TODO: runtime = O(?)
+    // TODO: runtime = O(L + logN), L = num nodes in range
     public List<Integer> rangeIndex(int lo, int hi) {
-        // TODO
         List<Integer> l = new LinkedList<>();
+        rangeIndex(l,root,lo,hi);
         return l;
     }
 
+    private void rangeIndex(List<Integer> l, RangeNode<Integer> n, int lo, int hi) {
+        if (n != null) {
+            int val = n.key;
+            if (val >= lo && val <= hi) {
+                rangeIndex(l, n.leftChild, lo, hi);
+                l.add(val);
+                rangeIndex(l, n.rightChild, lo, hi);
+            } else if (val < lo) {
+                rangeIndex(l, n.rightChild, lo, hi);
+            } else {// val > hi
+                rangeIndex(l, n.leftChild, lo, hi);
+            }
+        }
+    }
+
     // return the number of keys between [lo, hi], inclusive
-    // TODO: runtime = O(?)
+    // TODO: runtime = O(logN + L)
     public int rangeCount(int lo, int hi) {
-        // TODO
+        return rangeCount(root,lo,hi);
+    }
+
+    private int rangeCount(RangeNode<Integer> n, int lo, int hi) {
+        if (n != null) {
+            int val = n.key;
+            if (val >= lo && val <= hi) {
+                return 1 + rangeCount(n.rightChild,lo,hi) + rangeCount(n.leftChild,lo,hi);
+            } else if (val < lo) {
+                return rangeCount(n.rightChild, lo, hi);
+            } else {// val > hi
+                return rangeCount(n.leftChild, lo, hi);
+            }
+        }
         return 0;
     }
 
