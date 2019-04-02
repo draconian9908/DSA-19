@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class NQueens {
@@ -37,6 +38,32 @@ public class NQueens {
         return false;
     }
 
+    private static boolean checkAllLeft(char[][] board, int r, int c) {
+        // check 135 deg (upper left)
+        int y = r - 1;
+        int x = c - 1;
+        while (y >= 0 && x >= 0) {
+            if (board[y][x] == 'Q') return true;
+            x--;
+            y--;
+        }
+        // check -135 deg (lower left)
+        y = r + 1;
+        x = c - 1;
+        while (y < board.length && x >= 0) {
+            if (board[y][x] == 'Q') return true;
+            y++;
+            x--;
+        }
+        // check row to left
+        x = c - 1;
+        while (x >= 0) {
+            if (board[r][x] == 'Q') return true;
+            x--;
+        }
+        return false;
+    }
+
 
     /**
      * Creates a deep copy of the input array and returns it
@@ -50,9 +77,34 @@ public class NQueens {
 
 
     public static List<char[][]> nQueensSolutions(int n) {
-        // TODO
         List<char[][]> answers = new ArrayList<>();
+        char[][] board = new char[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                board[i][j] = '.';
+            }
+        }
+        halp(0, board, answers, n);
         return answers;
+    }
+
+    // work on one column at a time, iterate through rows, going left-to-right so only check against left side
+    private static void halp(int col, char[][] board, List<char[][]> answers, int numQ) {
+        if (col >= board.length && numQ == 0) {
+            answers.add(board);
+            return;
+        }
+
+        // check each row in the column
+        for (int i = 0; i < board.length; i++) {
+            if (!checkAllLeft(board,i,col)) {
+                char[][] board2 = copyOf(board);
+                board2[i][col] = 'Q';
+                numQ--;
+                halp(col+1, board2, answers, numQ);
+                numQ++;
+            }
+        }
     }
 
 }
