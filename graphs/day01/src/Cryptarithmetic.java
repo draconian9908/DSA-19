@@ -36,14 +36,13 @@ public class Cryptarithmetic {
 
     private static boolean owo(String s1, String s2, String s3, LinkedList<Character> needed, Map<Character, Integer> assignments) {
         if (needed.isEmpty()) return validSolution(s1, s2, s3, assignments);
+
         else {
             for (char el : needed) {
                 for (int i : randomOrder()) {
-//                    System.out.println(needed + "   ");
                     if (!assignments.containsValue(i)) {
                         LinkedList<Character> need2 = new LinkedList<Character>(needed);//(LinkedList) needed.clone();
                         need2.remove((Character) el);
-//                        System.out.println(need2);
                         assignments.put(el, i);
                         if (owo(s1, s2, s3, need2, assignments)) {
                             return true;
