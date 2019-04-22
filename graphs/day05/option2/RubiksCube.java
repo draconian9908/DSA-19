@@ -250,11 +250,11 @@ public class RubiksCube {
             int[] set = cubieList[j];// colors of the cubie currently looking at
             int[] actColors = new int[] {rc.getColor(set[0]), rc.getColor(set[1]), rc.getColor(set[2])};// colors cubie is supposed to be
             for (int i = 0; i < 3; i++) {// check the actual vs the expected colors
-                if (actColors[i] != colors[j][i]) {
-                    man++;
-                }
                 if (actColors[i] - colors[j][i] == 3 || colors[j][i] - actColors[i] == 3) {
                     man+=3;
+                }
+                else if (actColors[i] != colors[j][i]) {
+                    man++;
                 }
             }
         }
@@ -288,12 +288,15 @@ public class RubiksCube {
         HashMap<BitSet, Character> mapping = new HashMap<>();// map rubik's cube to rotation that lead to it
         HashMap<BitSet, Integer> visited = new HashMap<>();// map visited rubik's cubes to the cost when they were seen
         visited.put(state.cube, state.cost);
+        HashSet<BitSet> closed = new HashSet<>();
 
         while (!state.isSolved()) {// if not solved
             HashMap<RubiksCube, Character> temp = new HashMap<>();// map neighbor to rotation taken to get there
             List<RubiksCube> neighbors = neighbors(state, temp);// generate neighbors
+            closed.add(state.cube);
             for (int i = 0; i < neighbors.size(); i++) {// look at each neighbor
                 RubiksCube nei = neighbors.get(i);
+                if (closed.contains(nei.cube)) continue;
                 System.out.print(temp.get(nei) + "  ");
                 System.out.println(nei.cost);
                 int prevCost = visited.getOrDefault(nei.cube, -1);// check if bitset of neighbor has been seen before
@@ -304,6 +307,9 @@ public class RubiksCube {
                 }
             }
             state = states.poll();// remove 'state' that has the least cost
+//            for (RubiksCube s: states) {
+//                closed.add(s.cube);
+//            }
             for (RubiksCube s : states) {
                 System.out.print(s.cost + "   ");
             }
@@ -315,7 +321,6 @@ public class RubiksCube {
         System.out.println(moves);
         return moves;
     }
-
 }
 
 //                boolean wrong = false;
