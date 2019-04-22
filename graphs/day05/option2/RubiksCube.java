@@ -9,7 +9,8 @@ public class RubiksCube {
     private BitSet cube;
     private int move;
     private int cost;
-    private HashMap<int[], int[]> cubies = new HashMap<>();
+    private char prevRot;
+    private RubiksCube prevCube;
     private int[][] cubieList = new int[][]{
             {0,16,21}, {1,9,17}, {2,5,8}, {3,4,20},
             {12,19,22}, {13,10,18}, {14,6,11}, {15,7,23}
@@ -30,7 +31,7 @@ public class RubiksCube {
         }
         move = 0;
         cost = 0;
-        for (int i = 0; i < 8; i++) cubies.put(cubieList[i],colors[i]);
+        prevRot = 'z';
     }
 
     // initialize a rubiks cube with the input bitset
@@ -38,7 +39,7 @@ public class RubiksCube {
         cube = (BitSet) s.clone();
         move = 0;
         cost = newMan(this) + move;
-        for (int i = 0; i < 8; i++) cubies.put(cubieList[i],colors[i]);
+        prevRot = 'z';
     }
 
     // creates a copy of the rubiks cube
@@ -46,6 +47,7 @@ public class RubiksCube {
         cube = (BitSet) r.cube.clone();
         move = r.move;
         cost = move + newMan(this);
+        prevRot = r.prevRot;
     }
 
     // return true if this rubik's cube is equal to the other rubik's cube
@@ -166,6 +168,7 @@ public class RubiksCube {
         RubiksCube res = new RubiksCube(cube);
         for (int i = 0; i < faceFrom.length; i++) res.setColor(faceTo[i], this.getColor(faceFrom[i]));
         for (int i = 0; i < sidesFrom.length; i++) res.setColor(sidesTo[i], this.getColor(sidesFrom[i]));
+        res.prevRot = c;
         return res;
     }
 
@@ -207,42 +210,8 @@ public class RubiksCube {
     }
 
     /*
-     * new cost function; if block is next to side it should be on, cost = 1; if block on opposite face, cost = 3
+     * New heuristic function, essentially Manhattan Distance using cubies
      */
-//    private int newMan(RubiksCube rc) {
-//        int man = 0;
-//        for (int i = 0; i < 4; i++) {
-//            int currColor = rc.getColor(i);
-//            if (currColor != 3 && currColor != 0) man++;
-//            else if (currColor == 3) man += 3;
-//        }
-//        for (int i = 4; i < 8; i++) {
-//            int currColor = rc.getColor(i);
-//            if (currColor != 4 && currColor != 1) man++;
-//            else if (currColor == 4) man += 3;
-//        }
-//        for (int i = 8; i < 12; i++) {
-//            int currColor = rc.getColor(i);
-//            if (currColor != 5 && currColor != 2) man++;
-//            else if (currColor == 5) man += 3;
-//        }
-//        for (int i = 12; i < 16; i++) {
-//            int currColor = rc.getColor(i);
-//            if (currColor != 0 && currColor != 3) man++;
-//            else if (currColor == 0) man += 3;
-//        }
-//        for (int i = 16; i < 20; i++) {
-//            int currColor = rc.getColor(i);
-//            if (currColor != 1 && currColor != 4) man++;
-//            else if (currColor == 1) man += 3;
-//        }
-//        for (int i = 20; i < 24; i++) {
-//            int currColor = rc.getColor(i);
-//            if (currColor != 2 && currColor != 5) man++;
-//            else if (currColor == 2) man += 3;
-//        }
-//        return man;
-//    }
 
     private int newMan(RubiksCube rc) {
         int man = 0;
@@ -251,95 +220,70 @@ public class RubiksCube {
             int[] actColors = new int[] {rc.getColor(set[0]), rc.getColor(set[1]), rc.getColor(set[2])};// colors cubie is supposed to be
             for (int i = 0; i < 3; i++) {// check the actual vs the expected colors
                 if (actColors[i] - colors[j][i] == 3 || colors[j][i] - actColors[i] == 3) {
-                    man+=3;
+                    man+=2;// if on opposite side from where it should be, takes at least 2 moves to fix
                 }
                 else if (actColors[i] != colors[j][i]) {
-                    man++;
+                    man++;// if wrong and adjacent to where it should be, takes at least 1 move to fix
                 }
             }
         }
-        man = man / 4;
+        man = man / 4;// moves to fix one cubie actually affect 4 cubies
         return man;
     }
 
     /*
      * generate each neighbor of the current cube by performing a single rotation of a single type
      */
-    private List<RubiksCube> neighbors(RubiksCube rc, HashMap<RubiksCube, Character> m) {
+    private List<RubiksCube> neighbors(RubiksCube rc) {
         List<RubiksCube> neighbors = new LinkedList<>();
         char[] rots = new char[]{'u', 'U', 'r', 'R', 'f', 'F'};
         for (char rot : rots) {
             RubiksCube temp = rc.rotate(rot);
             temp.move = rc.move + 1;
             temp.cost = temp.move + newMan(temp);
+            temp.prevCube = rc;
             neighbors.add(temp);
-            m.put(temp, rot);
         }
         return neighbors;
     }
 
-    // return the list of rotations needed to solve a rubik's cube
-    public List<Character> solve() {
-        char[] rots = new char[]{'u', 'U', 'r', 'R', 'f', 'F'};
-        List<Character> moves = new ArrayList<>();
+    // return the solved cube, for backtracking
+    private RubiksCube solver() {
+        // SETUP
         RubiksCube state = new RubiksCube(cube);
-        PriorityQueue<RubiksCube> states = new PriorityQueue<>((a,b) -> a.cost-b.cost);
-        states.add(state);// add initial cube to priority queue
-        HashMap<BitSet, Character> mapping = new HashMap<>();// map rubik's cube to rotation that lead to it
+        PriorityQueue<RubiksCube> open = new PriorityQueue<>((a,b) -> a.cost-b.cost);
+        open.add(state);// add initial cube to priority queue
         HashMap<BitSet, Integer> visited = new HashMap<>();// map visited rubik's cubes to the cost when they were seen
-        visited.put(state.cube, state.cost);
-        HashSet<BitSet> closed = new HashSet<>();
 
-        while (!state.isSolved()) {// if not solved
-            HashMap<RubiksCube, Character> temp = new HashMap<>();// map neighbor to rotation taken to get there
-            List<RubiksCube> neighbors = neighbors(state, temp);// generate neighbors
-            closed.add(state.cube);
+        // A* LOOP
+        while (!open.isEmpty()) {
+            state = open.poll();// remove 'state' that has the least cost
+
+            List<RubiksCube> neighbors = neighbors(state);// generate neighbors
+            visited.put(state.cube, state.cost);
             for (int i = 0; i < neighbors.size(); i++) {// look at each neighbor
                 RubiksCube nei = neighbors.get(i);
-                if (closed.contains(nei.cube)) continue;
-                System.out.print(temp.get(nei) + "  ");
-                System.out.println(nei.cost);
+                if (nei.isSolved()) {
+                    return nei;
+                }
                 int prevCost = visited.getOrDefault(nei.cube, -1);// check if bitset of neighbor has been seen before
                 if (prevCost == -1 || prevCost > nei.cost) {// if hasn't been seen before or costs less this time...
-                    states.add(nei);// add to priority queue
-                    mapping.put(nei.cube, rots[i]);// add to map that is the 'solution tree', the path of cubes and rotations taken
-                    visited.put(nei.cube, nei.cost);// add to visited set
+                    open.add(nei);// add to priority queue
                 }
             }
-            state = states.poll();// remove 'state' that has the least cost
-//            for (RubiksCube s: states) {
-//                closed.add(s.cube);
-//            }
-            for (RubiksCube s : states) {
-                System.out.print(s.cost + "   ");
-            }
-            System.out.println("| " + state.cost);
-            if (mapping.get(state.cube) != null) {// don't want to put null in the list of rotations...
-                moves.add(mapping.get(state.cube));// add to solution, list of moves needed to reach the end
-            }
         }
-        System.out.println(moves);
+
+        return new RubiksCube(new BitSet(24*3));
+    }
+
+    public List<Character> solve() {
+        List<Character> moves = new ArrayList<>();
+        RubiksCube solved = solver();
+        while(solved.prevRot != 'z') {
+            moves.add(solved.prevRot);
+            solved = solved.prevCube;
+        }
+        Collections.reverse(moves);
         return moves;
     }
 }
-
-//                boolean wrong = false;
-
-//                if (!moves.isEmpty() && temp.get(nei) != null) {
-////                    System.out.print(temp.get(nei) + "   ");
-//                    System.out.println(moves.get(moves.size()-1));
-//                    if (Character.isUpperCase(temp.get(nei))) {
-//                        if (temp.get(nei) == Character.toUpperCase(moves.get(moves.size()-1)) && Character.isLowerCase(moves.get(moves.size()-1))) {
-//                            wrong = true;
-////                            continue;
-//                        }
-//                    }
-//                    else {
-//                        if (temp.get(nei) == Character.toLowerCase(moves.get(moves.size()-1)) && Character.isUpperCase(moves.get(moves.size()-1))) {
-//                            wrong = true;
-////                            continue;
-//                        }
-//                    }
-//                }
-
-//                if (wrong) System.out.println(nei.cost + "    " + prevCost);
