@@ -284,37 +284,57 @@ public class RubiksCube {
         List<Character> moves = new ArrayList<>();
         RubiksCube state = new RubiksCube(cube);
         PriorityQueue<RubiksCube> states = new PriorityQueue<>((a,b) -> a.cost-b.cost);
-        states.add(state);
+        states.add(state);// add initial cube to priority queue
         HashMap<BitSet, Character> mapping = new HashMap<>();// map rubik's cube to rotation that lead to it
         HashMap<BitSet, Integer> visited = new HashMap<>();// map visited rubik's cubes to the cost when they were seen
         visited.put(state.cube, state.cost);
 
-        while (!state.isSolved()) {
-            HashMap<RubiksCube, Character> temp = new HashMap<>();
-            List<RubiksCube> neighbors = neighbors(state, temp);
-            for (int i = 0; i < neighbors.size(); i++) {
+        while (!state.isSolved()) {// if not solved
+            HashMap<RubiksCube, Character> temp = new HashMap<>();// map neighbor to rotation taken to get there
+            List<RubiksCube> neighbors = neighbors(state, temp);// generate neighbors
+            for (int i = 0; i < neighbors.size(); i++) {// look at each neighbor
                 RubiksCube nei = neighbors.get(i);
-                if (!moves.isEmpty() && temp.get(nei) != null) {
-                    if (Character.isUpperCase(temp.get(nei))) {
-                        if (temp.get(nei) == Character.toUpperCase(moves.get(moves.size()-1)) && Character.isLowerCase(moves.get(moves.size()-1))) continue;
-                    }
-                    else {
-                        if (temp.get(nei) == Character.toLowerCase(moves.get(moves.size()-1)) && Character.isUpperCase(moves.get(moves.size()-1))) continue;
-                    }
-                }
-                int prevCost = visited.getOrDefault(nei.cube, -1);
-                if (prevCost == -1 || prevCost > nei.cost) {
-                    states.add(nei);
-                    mapping.put(nei.cube, rots[i]);
-                    visited.put(state.cube, state.cost);
+                System.out.print(temp.get(nei) + "  ");
+                System.out.println(nei.cost);
+                int prevCost = visited.getOrDefault(nei.cube, -1);// check if bitset of neighbor has been seen before
+                if (prevCost == -1 || prevCost > nei.cost) {// if hasn't been seen before or costs less this time...
+                    states.add(nei);// add to priority queue
+                    mapping.put(nei.cube, rots[i]);// add to map that is the 'solution tree', the path of cubes and rotations taken
+                    visited.put(nei.cube, nei.cost);// add to visited set
                 }
             }
-            state = states.poll();
-            if (mapping.get(state.cube) != null)
-                moves.add(mapping.get(state.cube));
+            state = states.poll();// remove 'state' that has the least cost
+            for (RubiksCube s : states) {
+                System.out.print(s.cost + "   ");
+            }
+            System.out.println("| " + state.cost);
+            if (mapping.get(state.cube) != null) {// don't want to put null in the list of rotations...
+                moves.add(mapping.get(state.cube));// add to solution, list of moves needed to reach the end
+            }
         }
         System.out.println(moves);
         return moves;
     }
 
 }
+
+//                boolean wrong = false;
+
+//                if (!moves.isEmpty() && temp.get(nei) != null) {
+////                    System.out.print(temp.get(nei) + "   ");
+//                    System.out.println(moves.get(moves.size()-1));
+//                    if (Character.isUpperCase(temp.get(nei))) {
+//                        if (temp.get(nei) == Character.toUpperCase(moves.get(moves.size()-1)) && Character.isLowerCase(moves.get(moves.size()-1))) {
+//                            wrong = true;
+////                            continue;
+//                        }
+//                    }
+//                    else {
+//                        if (temp.get(nei) == Character.toLowerCase(moves.get(moves.size()-1)) && Character.isUpperCase(moves.get(moves.size()-1))) {
+//                            wrong = true;
+////                            continue;
+//                        }
+//                    }
+//                }
+
+//                if (wrong) System.out.println(nei.cost + "    " + prevCost);
